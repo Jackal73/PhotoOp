@@ -1,4 +1,3 @@
-import { Models } from "appwrite";
 import { GridPostList, Loader } from "@/components/shared";
 
 type SearchResultsProps = {
