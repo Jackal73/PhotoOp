@@ -58,7 +58,7 @@ const SigninForm = () => {
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
         <img
-          src="../../../public/assets/images/PhotoOp-1.svg"
+          src="/assets/images/PhotoOp-1.svg"
           alt="logo"
           className=" w-[250px]"
         />
