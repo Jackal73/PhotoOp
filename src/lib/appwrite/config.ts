@@ -17,10 +17,26 @@ export const appwriteConfig = {
 
 export const client = new Client();
 
-const resolvedEndpoint =
-  appwriteConfig.url?.startsWith("http")
-    ? appwriteConfig.url
-    : `${window.location.origin}${appwriteConfig.url}`;
+// Runtime check for VITE_APPWRITE_URL
+if (
+  !appwriteConfig.url ||
+  appwriteConfig.url === "/v1" ||
+  appwriteConfig.url === "http://localhost:5173/v1"
+) {
+  throw new Error(
+    "[Appwrite] VITE_APPWRITE_URL is missing or invalid! Check your Vercel environment variables.",
+  );
+}
+
+const resolvedEndpoint = appwriteConfig.url?.startsWith("http")
+  ? appwriteConfig.url
+  : `${window.location.origin}${appwriteConfig.url}`;
+
+// Log the resolved endpoint for debugging (only in development)
+if (import.meta.env.DEV) {
+  // eslint-disable-next-line no-console
+  console.log("[Appwrite] Using endpoint:", resolvedEndpoint);
+}
 
 client.setEndpoint(resolvedEndpoint);
 client.setProject(appwriteConfig.projectId);
