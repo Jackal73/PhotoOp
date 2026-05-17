@@ -69,7 +69,10 @@ const ReelsBar = () => {
 
       video.onloadedmetadata = () => {
         // Seek to 0.5s or 0 if shorter
-        const seekTime = Math.min(0.5, video.duration ? video.duration - 0.01 : 0);
+        const seekTime = Math.min(
+          0.5,
+          video.duration ? video.duration - 0.01 : 0,
+        );
         video.currentTime = seekTime;
       };
       video.onseeked = () => {
@@ -79,10 +82,14 @@ const ReelsBar = () => {
         const ctx = canvas.getContext("2d");
         if (!ctx) return reject(new Error("Canvas context error"));
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error("Failed to create thumbnail blob"));
-        }, "image/jpeg", 0.85);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("Failed to create thumbnail blob"));
+          },
+          "image/jpeg",
+          0.85,
+        );
         URL.revokeObjectURL(video.src);
       };
       video.onerror = () => {
@@ -92,7 +99,9 @@ const ReelsBar = () => {
   };
 
   // Helper: Upload a Blob as a File to Appwrite
-  const uploadThumbnail = async (blob: Blob): Promise<{ fileId: string; url: string }> => {
+  const uploadThumbnail = async (
+    blob: Blob,
+  ): Promise<{ fileId: string; url: string }> => {
     // Use the same uploadFile as for images
     // @ts-ignore: uploadFile expects File, but Blob is sufficient for Appwrite
     const thumbFile = new File([blob], "thumbnail.jpg", { type: "image/jpeg" });
@@ -117,7 +126,8 @@ const ReelsBar = () => {
       // 1. Extract thumbnail
       const thumbBlob = await extractThumbnail(selectedFile);
       // 2. Upload thumbnail
-      const { url: thumbnailUrl, fileId: thumbnailId } = await uploadThumbnail(thumbBlob);
+      const { url: thumbnailUrl, fileId: thumbnailId } =
+        await uploadThumbnail(thumbBlob);
 
       // 3. Create reel with thumbnailUrl
       createReel(
