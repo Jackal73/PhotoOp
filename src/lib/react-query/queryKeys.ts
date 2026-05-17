@@ -17,4 +17,27 @@ export enum QUERY_KEYS {
 
   //  SEARCH KEYS
   SEARCH_POSTS = "getSearchPosts",
+
+  // COMMENT KEYS
+  GET_COMMENTS = "getComments",
+  GET_POST_COMMENTS = "getRecentComments",
+  GET_COMMENT_BY_ID = "getCommentById",
+  GET_CHILD_COMMENTS = "getChildComments",
+
+  // SHARE KEYS
+  GET_POST_SHARES = "getPostShares",
+
+  // CHAT KEYS
+  GET_CHAT_CONVERSATIONS = "getChatConversations",
+  GET_CHAT_MESSAGES = "getChatMessages",
+  GET_CHAT_UNREAD_COUNT = "getChatUnreadCount",
+
+  // REELS KEYS
+  GET_RECENT_REELS = "getRecentReels",
+
+  // FOLLOW KEYS
+  GET_FOLLOW_DOCUMENT = "getFollowDocument",
+  GET_FOLLOWING = "getFollowing",
+  GET_FOLLOWERS = "getFollowers",
+  GET_PENDING_FOLLOW_REQUESTS = "getPendingFollowRequests",
 }

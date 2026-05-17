@@ -8,11 +8,21 @@ export const appwriteConfig = {
   userCollectionId: import.meta.env.VITE_APPWRITE_USER_COLLECTION_ID,
   postCollectionId: import.meta.env.VITE_APPWRITE_POST_COLLECTION_ID,
   savesCollectionId: import.meta.env.VITE_APPWRITE_SAVES_COLLECTION_ID,
+  commentCollectionId: import.meta.env.VITE_APPWRITE_COMMENT_COLLECTION_ID,
+  sharesCollectionId: import.meta.env.VITE_APPWRITE_SHARES_COLLECTION_ID,
+  chatCollectionId: import.meta.env.VITE_APPWRITE_CHAT_COLLECTION_ID,
+  reelsCollectionId: import.meta.env.VITE_APPWRITE_REELS_COLLECTION_ID,
+  followsCollectionId: import.meta.env.VITE_APPWRITE_FOLLOWS_COLLECTION_ID,
 };
 
 export const client = new Client();
 
-client.setEndpoint(appwriteConfig.url);
+const resolvedEndpoint =
+  appwriteConfig.url?.startsWith("http")
+    ? appwriteConfig.url
+    : `${window.location.origin}${appwriteConfig.url}`;
+
+client.setEndpoint(resolvedEndpoint);
 client.setProject(appwriteConfig.projectId);
 
 export const account = new Account(client);

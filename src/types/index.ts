@@ -46,3 +46,42 @@ export type INewUser = {
   username: string;
   password: string;
 };
+
+export type IComment = {
+  postId: string;
+  userId: string;
+  comment_text: string;
+  parentCommentID: string | null;
+  childrenCommentId: string[] | null;
+};
+
+export type IShareEvent = {
+  postId: string;
+  userId: string;
+  channel: "native" | "clipboard";
+};
+
+export type INewChatMessage = {
+  senderId: string;
+  receiverId: string;
+  text: string;
+};
+
+export type IChatConversation = {
+  conversationId: string;
+  partnerId: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+};
+
+export type INewReel = {
+  userId: string;
+  caption: string;
+  file: File;
+};
+
+export type IUpdateReel = {
+  reelId: string;
+  caption: string;
+};
