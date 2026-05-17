@@ -22,7 +22,12 @@ import {
   useGetPendingFollowRequests,
   useGetUsersByIds,
 } from "@/lib/react-query/queriesAndMutations";
-import { GridPostList, Loader, FollowRequestCard, FollowListDialog } from "@/components/shared";
+import {
+  GridPostList,
+  Loader,
+  FollowRequestCard,
+  FollowListDialog,
+} from "@/components/shared";
 
 interface StatBlockProps {
   value: string | number;
@@ -46,11 +51,16 @@ const Profile = () => {
   const { pathname } = useLocation();
 
   const { data: currentUser } = useGetUserById(id || "");
-  const { data: userPostsData, isLoading: isLoadingUserPosts } = useGetUserPosts(id || "");
+  const { data: userPostsData, isLoading: isLoadingUserPosts } =
+    useGetUserPosts(id || "");
   const userPosts = userPostsData?.documents || [];
 
   // Follow state
-  const { data: followDoc } = useGetFollowDocument(user.id, id || "");
+  const isUserReady = !!user && !!user.id && !!id;
+  const { data: followDoc } = useGetFollowDocument(
+    isUserReady ? user.id : "",
+    isUserReady ? id : "",
+  );
   const { mutate: follow, isPending: isSendingFollow } = useFollowUser();
   const { mutate: unfollow, isPending: isUnfollowing } = useUnfollowUser();
   const [localStatus, setLocalStatus] = useState<string | null>(null);
@@ -62,24 +72,35 @@ const Profile = () => {
   }, [followDoc]);
 
   // Follower / following counts
-  const { data: followerDocs = [] } = useGetFollowers(id || "");
-  const { data: followingDocs = [] } = useGetFollowing(id || "");
+  const { data: followerDocs = [] } = useGetFollowers(isUserReady ? id : "");
+  const { data: followingDocs = [] } = useGetFollowing(isUserReady ? id : "");
 
   // Pending requests (only visible to profile owner)
   const isOwnProfile = user.id === id;
-  const { data: pendingRequests = [] } = useGetPendingFollowRequests(isOwnProfile ? (id || "") : "");
-  const pendingRequesterIds = pendingRequests.map((doc: any) => doc.followerId as string);
-  const { data: pendingRequestersResult } = useGetUsersByIds(pendingRequesterIds);
+  const { data: pendingRequests = [] } = useGetPendingFollowRequests(
+    isOwnProfile && isUserReady ? id : "",
+  );
+  const pendingRequesterIds = pendingRequests.map(
+    (doc: any) => doc.followerId as string,
+  );
+  const { data: pendingRequestersResult } =
+    useGetUsersByIds(pendingRequesterIds);
   const pendingRequesters = pendingRequestersResult?.documents || [];
 
   // Follow list dialog state
-  const [followListDialog, setFollowListDialog] = useState<"followers" | "following" | null>(null);
+  const [followListDialog, setFollowListDialog] = useState<
+    "followers" | "following" | null
+  >(null);
 
   const handleFollowToggle = () => {
     if (localStatus && localDocId) {
       setLocalStatus(null);
       setLocalDocId(null);
-      unfollow({ followDocumentId: localDocId, followerId: user.id, followingId: id || "" });
+      unfollow({
+        followDocumentId: localDocId,
+        followerId: user.id,
+        followingId: id || "",
+      });
     } else {
       setLocalStatus("pending");
       follow({ followerId: user.id, followingId: id || "" });
@@ -183,7 +204,9 @@ const Profile = () => {
         <div className="w-full max-w-5xl bg-dark-2 border border-dark-4 rounded-2xl p-5">
           <h3 className="base-semibold text-light-1 mb-1">
             Follow Requests
-            <span className="ml-2 text-primary-500">{pendingRequests.length}</span>
+            <span className="ml-2 text-primary-500">
+              {pendingRequests.length}
+            </span>
           </h3>
           <p className="tiny-medium text-light-4 mb-4">
             These people want to follow you.
@@ -247,7 +270,10 @@ const Profile = () => {
           }
         />
         {currentUser.$id === user.id && (
-          <Route path="/liked-posts" element={<LikedPosts liked={currentUser.liked || []} />} />
+          <Route
+            path="/liked-posts"
+            element={<LikedPosts liked={currentUser.liked || []} />}
+          />
         )}
       </Routes>
       <Outlet />

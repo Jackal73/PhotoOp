@@ -626,12 +626,23 @@ export const useDeleteReel = () => {
 export const useFollowUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ followerId, followingId }: { followerId: string; followingId: string }) =>
-      followUser(followerId, followingId),
+    mutationFn: ({
+      followerId,
+      followingId,
+    }: {
+      followerId: string;
+      followingId: string;
+    }) => followUser(followerId, followingId),
     onSuccess: (_data, { followerId, followingId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId],
+      });
     },
   });
 };
@@ -639,17 +650,31 @@ export const useFollowUser = () => {
 export const useUnfollowUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ followDocumentId }: { followDocumentId: string; followerId: string; followingId: string }) =>
-      unfollowUser(followDocumentId),
+    mutationFn: ({
+      followDocumentId,
+    }: {
+      followDocumentId: string;
+      followerId: string;
+      followingId: string;
+    }) => unfollowUser(followDocumentId),
     onSuccess: (_data, { followerId, followingId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId],
+      });
     },
   });
 };
 
-export const useGetFollowDocument = (followerId: string, followingId: string) => {
+export const useGetFollowDocument = (
+  followerId: string,
+  followingId: string,
+) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
     queryFn: () => getFollowDocument(followerId, followingId),
@@ -684,13 +709,26 @@ export const useGetUsersByIds = (userIds: string[]) => {
 export const useAcceptFollowRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ followDocumentId }: { followDocumentId: string; followerId: string; followingId: string }) =>
-      acceptFollowRequest(followDocumentId),
+    mutationFn: ({
+      followDocumentId,
+    }: {
+      followDocumentId: string;
+      followerId: string;
+      followingId: string;
+    }) => acceptFollowRequest(followDocumentId),
     onSuccess: (_data, { followerId, followingId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_PENDING_FOLLOW_REQUESTS, followingId] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_PENDING_FOLLOW_REQUESTS, followingId],
+      });
     },
   });
 };
@@ -698,11 +736,20 @@ export const useAcceptFollowRequest = () => {
 export const useDeclineFollowRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ followDocumentId }: { followDocumentId: string; followerId: string; followingId: string }) =>
-      declineFollowRequest(followDocumentId),
+    mutationFn: ({
+      followDocumentId,
+    }: {
+      followDocumentId: string;
+      followerId: string;
+      followingId: string;
+    }) => declineFollowRequest(followDocumentId),
     onSuccess: (_data, { followerId, followingId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_PENDING_FOLLOW_REQUESTS, followingId] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_PENDING_FOLLOW_REQUESTS, followingId],
+      });
     },
   });
 };

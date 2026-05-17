@@ -16,7 +16,7 @@ const LikedPosts = () => {
         const res = await databases.listDocuments(
           appwriteConfig.databaseId,
           appwriteConfig.postCollectionId,
-          [Query.contains("likes", user.id)]
+          [Query.equal("likes", user.id)],
         );
         setPosts(res.documents || []);
       } catch (e) {

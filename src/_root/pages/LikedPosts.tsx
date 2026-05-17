@@ -20,7 +20,7 @@ const LikedPosts = ({ liked }: LikedPostsProps) => {
           } catch {
             return null;
           }
-        })
+        }),
       );
       setPosts(fetchedPosts.filter(Boolean));
       setLoading(false);

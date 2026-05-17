@@ -79,6 +79,8 @@ export type INewReel = {
   userId: string;
   caption: string;
   file: File;
+  thumbnailUrl?: string;
+  thumbnailId?: string;
 };
 
 export type IUpdateReel = {

@@ -43,8 +43,6 @@ const PostStatsRelated = ({ post, userId }: PostStatsProps) => {
     !!post?.$id && !!userId,
   );
 
-
-
   const { data: currentUser } = useGetCurrentUser();
 
   const savedPostRecord = currentUser?.save.find(
@@ -169,8 +167,6 @@ const PostStatsRelated = ({ post, userId }: PostStatsProps) => {
           <p className="small-medium lg:base-medium">{sharesCount}</p>
           <p className="small-regular text-light-4">({uniqueSharersCount}u)</p>
         </div>
-
-
       </div>
 
       <div className="flex gap-2">

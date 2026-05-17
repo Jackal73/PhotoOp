@@ -1,3 +1,45 @@
+// ============================== CREATE POST
+export async function createPost(post: INewPost) {
+  try {
+    // Upload file to appwrite storage
+    const uploadedFile = await uploadFile(post.file[0]);
+    if (!uploadedFile) throw Error;
+
+    // Get file url
+    const fileUrl = getFilePreview(uploadedFile.$id);
+    if (!fileUrl) {
+      await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+
+    // Convert tags into array
+    const tags = post.tags?.replace(/ /g, "").split(",") || [];
+
+    // Create post
+    const newPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      ID.unique(),
+      {
+        creator: post.userId,
+        caption: post.caption,
+        imageUrl: fileUrl,
+        imageId: uploadedFile.$id,
+        location: post.location,
+        tags: tags,
+      },
+    );
+
+    if (!newPost) {
+      await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+
+    return newPost;
+  } catch (error) {
+    console.log(error);
+  }
+}
 import { ID, Permission, Query, Role } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
@@ -164,44 +206,43 @@ export async function signOutAccount() {
 // ============================================================
 
 // ============================== CREATE POST
-export async function createPost(post: INewPost) {
+export async function createReel(
+  reel: INewReel & { thumbnailUrl?: string; thumbnailId?: string },
+) {
   try {
-    // Upload file to appwrite storage
-    const uploadedFile = await uploadFile(post.file[0]);
-
+    // Upload video file to appwrite storage
+    const uploadedFile = await uploadFile(reel.file);
     if (!uploadedFile) throw Error;
 
-    // Get file url
+    // Get video file url
     const fileUrl = getFilePreview(uploadedFile.$id);
     if (!fileUrl) {
       await deleteFile(uploadedFile.$id);
       throw Error;
     }
 
-    // Convert tags into array
-    const tags = post.tags?.replace(/ /g, "").split(",") || [];
-
-    // Create post
-    const newPost = await databases.createDocument(
+    // Create reel document with thumbnailUrl and thumbnailId if provided
+    const newReel = await databases.createDocument(
       appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
+      appwriteConfig.reelsCollectionId,
       ID.unique(),
       {
-        creator: post.userId,
-        caption: post.caption,
-        imageUrl: fileUrl,
-        imageId: uploadedFile.$id,
-        location: post.location,
-        tags: tags,
+        creator: reel.userId,
+        caption: reel.caption,
+        videoUrl: fileUrl,
+        videoId: uploadedFile.$id,
+        thumbnailUrl: reel.thumbnailUrl || "",
+        thumbnailId: reel.thumbnailId || "",
       },
     );
 
-    if (!newPost) {
+    if (!newReel) {
       await deleteFile(uploadedFile.$id);
+      if (reel.thumbnailId) await deleteFile(reel.thumbnailId);
       throw Error;
     }
 
-    return newPost;
+    return newReel;
   } catch (error) {
     console.log(error);
   }
@@ -275,38 +316,41 @@ export async function searchPosts(searchTerm: string) {
       return { documents: [], total: 0 };
     }
 
-    const [captionMatches, tagMatches, exactTagMatches, hashTagMatches] = await Promise.allSettled([
-      databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.postCollectionId,
-        [Query.search("caption", normalizedTerm)],
-      ),
-      databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.postCollectionId,
-        [Query.search("tags", normalizedTerm)],
-      ),
-      databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.postCollectionId,
-        [Query.equal("tags", normalizedTerm)],
-      ),
-      databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.postCollectionId,
-        [Query.equal("tags", `#${normalizedTerm}`)],
-      ),
-    ]);
+    const [captionMatches, tagMatches, exactTagMatches, hashTagMatches] =
+      await Promise.allSettled([
+        databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.postCollectionId,
+          [Query.search("caption", normalizedTerm)],
+        ),
+        databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.postCollectionId,
+          [Query.search("tags", normalizedTerm)],
+        ),
+        databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.postCollectionId,
+          [Query.equal("tags", normalizedTerm)],
+        ),
+        databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.postCollectionId,
+          [Query.equal("tags", `#${normalizedTerm}`)],
+        ),
+      ]);
 
     const mergedDocs: Record<string, any> = {};
 
-    [captionMatches, tagMatches, exactTagMatches, hashTagMatches].forEach((result) => {
-      if (result.status === "fulfilled") {
-        result.value.documents.forEach((doc: any) => {
-          mergedDocs[doc.$id] = doc;
-        });
-      }
-    });
+    [captionMatches, tagMatches, exactTagMatches, hashTagMatches].forEach(
+      (result) => {
+        if (result.status === "fulfilled") {
+          result.value.documents.forEach((doc: any) => {
+            mergedDocs[doc.$id] = doc;
+          });
+        }
+      },
+    );
 
     let documents = Object.values(mergedDocs);
 
@@ -324,7 +368,9 @@ export async function searchPosts(searchTerm: string) {
           String(tag).replace(/^#+/, "").toLowerCase(),
         );
 
-        return caption.includes(normalizedTerm) || tags.includes(normalizedTerm);
+        return (
+          caption.includes(normalizedTerm) || tags.includes(normalizedTerm)
+        );
       });
     }
 
@@ -465,7 +511,11 @@ export async function deletePost(postId?: string, imageId?: string) {
 }
 
 // ============================== LIKE / UNLIKE POST
-export async function likePost(postId: string, likesArray: string[], userId?: string) {
+export async function likePost(
+  postId: string,
+  likesArray: string[],
+  userId?: string,
+) {
   try {
     // Update the post's likes array
     const updatedPost = await databases.updateDocument(
@@ -482,7 +532,7 @@ export async function likePost(postId: string, likesArray: string[], userId?: st
       const user = await databases.getDocument(
         appwriteConfig.databaseId,
         appwriteConfig.userCollectionId,
-        userId
+        userId,
       );
       let liked = Array.isArray(user.liked) ? [...user.liked] : [];
       if (likesArray.includes(userId)) {
@@ -496,7 +546,7 @@ export async function likePost(postId: string, likesArray: string[], userId?: st
         appwriteConfig.databaseId,
         appwriteConfig.userCollectionId,
         userId,
-        { liked }
+        { liked },
       );
     }
 
@@ -1182,54 +1232,6 @@ export async function markConversationAsRead(
 // REELS
 // ============================================================
 
-export async function createReel(reel: INewReel) {
-  if (!appwriteConfig.reelsCollectionId) {
-    throw new Error("Reels collection is not configured.");
-  }
-
-  if (!reel.file.type.startsWith("video/")) {
-    throw new Error("Only video files are allowed for reels.");
-  }
-
-  const maxBytes = 15 * 1024 * 1024;
-  if (reel.file.size > maxBytes) {
-    throw new Error("Reel must be 15MB or smaller.");
-  }
-
-  try {
-    const uploadedFile = await uploadFile(reel.file);
-    if (!uploadedFile) throw Error;
-
-    const videoUrl = getFileView(uploadedFile.$id);
-    if (!videoUrl) {
-      await deleteFile(uploadedFile.$id);
-      throw Error;
-    }
-
-    const newReel = await databases.createDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.reelsCollectionId,
-      ID.unique(),
-      {
-        creator: reel.userId,
-        caption: reel.caption,
-        videoUrl,
-        videoId: uploadedFile.$id,
-      },
-    );
-
-    if (!newReel) {
-      await deleteFile(uploadedFile.$id);
-      throw Error;
-    }
-
-    return newReel;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-}
-
 export async function getRecentReels() {
   if (!appwriteConfig.reelsCollectionId) {
     return { documents: [], total: 0 };
@@ -1311,9 +1313,9 @@ export async function followUser(followerId: string, followingId: string) {
       { followerId, followingId, status: "pending" },
       [
         Permission.read(Role.any()),
-        Permission.update(Role.user(followingId)), // target can accept/decline
-        Permission.delete(Role.user(followerId)),  // sender can cancel
-        Permission.delete(Role.user(followingId)), // target can decline
+        Permission.update(`user:${followingId}`), // target can accept/decline
+        Permission.delete(`user:${followerId}`), // sender can cancel
+        Permission.delete(`user:${followingId}`), // target can decline
       ],
     );
     return follow;
@@ -1370,7 +1372,10 @@ export async function declineFollowRequest(followDocumentId: string) {
 }
 
 // ============================== GET FOLLOW DOCUMENT (any status)
-export async function getFollowDocument(followerId: string, followingId: string) {
+export async function getFollowDocument(
+  followerId: string,
+  followingId: string,
+) {
   try {
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
