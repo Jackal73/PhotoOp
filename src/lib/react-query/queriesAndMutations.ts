@@ -650,25 +650,14 @@ export const useFollowUser = () => {
 export const useUnfollowUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      followDocumentId,
-      followerId,
-      followingId,
-    }: {
-      followDocumentId: string;
-      followerId: string;
-      followingId: string;
-    }) => unfollowUser(followDocumentId),
-    onSuccess: (_data, { followerId, followingId }) => {
+    mutationFn: ({ followDocumentId }: { followDocumentId: string }) =>
+      unfollowUser(followDocumentId),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT, followerId, followingId],
+        queryKey: [QUERY_KEYS.GET_FOLLOW_DOCUMENT],
       });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_FOLLOWING, followerId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_FOLLOWERS, followingId],
-      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWING] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FOLLOWERS] });
     },
   });
 };
