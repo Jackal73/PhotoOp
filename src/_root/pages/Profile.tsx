@@ -98,8 +98,6 @@ const Profile = () => {
       setLocalDocId(null);
       unfollow({
         followDocumentId: localDocId,
-        followerId: user.id,
-        followingId: id || "",
       });
     } else {
       setLocalStatus("pending");

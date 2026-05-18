@@ -41,8 +41,6 @@ const UserCard = ({ user }: UserCardProps) => {
       setLocalDocId(null);
       unfollow({
         followDocumentId: localDocId,
-        followerId: currentUser.id,
-        followingId: user.$id,
       });
     } else {
       // Send follow request
