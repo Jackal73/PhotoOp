@@ -652,6 +652,8 @@ export const useUnfollowUser = () => {
   return useMutation({
     mutationFn: ({
       followDocumentId,
+      followerId,
+      followingId,
     }: {
       followDocumentId: string;
       followerId: string;

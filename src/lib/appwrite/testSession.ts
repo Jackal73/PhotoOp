@@ -8,7 +8,9 @@ export async function testAppwriteSession() {
     const session = await account.getSession("current");
     console.log("[Appwrite Session Test] Session:", session);
     if (!session) {
-      console.warn("[Appwrite Session Test] No active session. User is not logged in.");
+      console.warn(
+        "[Appwrite Session Test] No active session. User is not logged in.",
+      );
       return false;
     }
     const user = await account.get();

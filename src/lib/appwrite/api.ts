@@ -1328,10 +1328,7 @@ export async function followUser(followerId: string, followingId: string) {
       appwriteConfig.followsCollectionId,
       ID.unique(),
       { followerId, followingId, status: "pending" },
-      [
-        Permission.read(Role.users()),
-        Permission.write(Role.users()),
-      ]
+      [Permission.read(Role.users()), Permission.write(Role.users())],
     );
     return follow;
   } catch (error: any) {
@@ -1341,11 +1338,7 @@ export async function followUser(followerId: string, followingId: string) {
 }
 
 // ============================== UNFOLLOW / CANCEL REQUEST
-export async function unfollowUser(
-  followDocumentId: string,
-  followerId: string,
-  followingId: string,
-) {
+export async function unfollowUser(followDocumentId: string) {
   try {
     await databases.deleteDocument(
       appwriteConfig.databaseId,

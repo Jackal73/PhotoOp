@@ -39,7 +39,11 @@ const UserCard = ({ user }: UserCardProps) => {
       // Cancel request or unfollow
       setLocalStatus(null);
       setLocalDocId(null);
-      unfollow({ followDocumentId: localDocId, followerId: currentUser.id, followingId: user.$id });
+      unfollow({
+        followDocumentId: localDocId,
+        followerId: currentUser.id,
+        followingId: user.$id,
+      });
     } else {
       // Send follow request
       setLocalStatus("pending");
@@ -70,8 +74,12 @@ const UserCard = ({ user }: UserCardProps) => {
       />
 
       <div className="flex-center flex-col gap-1">
-        <p className="base-medium text-light-1 text-center line-clamp-1">{user.name}</p>
-        <p className="small-regular text-light-3 text-center line-clamp-1">@{user.username}</p>
+        <p className="base-medium text-light-1 text-center line-clamp-1">
+          {user.name}
+        </p>
+        <p className="small-regular text-light-3 text-center line-clamp-1">
+          @{user.username}
+        </p>
       </div>
 
       <div className="h-9 flex items-center">
@@ -94,4 +102,3 @@ const UserCard = ({ user }: UserCardProps) => {
 };
 
 export default UserCard;
-

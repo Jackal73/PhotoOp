@@ -9,12 +9,15 @@ import { Button } from "../ui/button";
 
 export default function FollowRequestList() {
   const { user } = useUserContext();
-  const { data: pendingRequests, isLoading } = useGetPendingFollowRequests(user.id);
+  const { data: pendingRequests, isLoading } = useGetPendingFollowRequests(
+    user.id,
+  );
   const { mutate: accept, isPending: isAccepting } = useAcceptFollowRequest();
   const { mutate: decline, isPending: isDeclining } = useDeclineFollowRequest();
 
   if (isLoading) return <div>Loading follow requests...</div>;
-  if (!pendingRequests || pendingRequests.length === 0) return <div>No pending follow requests.</div>;
+  if (!pendingRequests || pendingRequests.length === 0)
+    return <div>No pending follow requests.</div>;
 
   return (
     <div className="follow-request-list">
@@ -23,8 +26,20 @@ export default function FollowRequestList() {
         <FollowRequestCard
           key={req.$id}
           request={req}
-          onAccept={() => accept({ followDocumentId: req.$id, followerId: req.followerId, followingId: req.followingId })}
-          onDecline={() => decline({ followDocumentId: req.$id, followerId: req.followerId, followingId: req.followingId })}
+          onAccept={() =>
+            accept({
+              followDocumentId: req.$id,
+              followerId: req.followerId,
+              followingId: req.followingId,
+            })
+          }
+          onDecline={() =>
+            decline({
+              followDocumentId: req.$id,
+              followerId: req.followerId,
+              followingId: req.followingId,
+            })
+          }
           isAccepting={isAccepting}
           isDeclining={isDeclining}
         />
@@ -33,7 +48,13 @@ export default function FollowRequestList() {
   );
 }
 
-function FollowRequestCard({ request, onAccept, onDecline, isAccepting, isDeclining }: any) {
+function FollowRequestCard({
+  request,
+  onAccept,
+  onDecline,
+  isAccepting,
+  isDeclining,
+}: any) {
   // Optionally fetch user info for display
   const { data: follower } = useGetUserById(request.followerId);
   return (
@@ -44,12 +65,18 @@ function FollowRequestCard({ request, onAccept, onDecline, isAccepting, isDeclin
           alt={follower?.name || request.followerId}
           className="w-8 h-8 rounded-full"
         />
-        <span className="font-medium">{follower?.name || request.followerId}</span>
+        <span className="font-medium">
+          {follower?.name || request.followerId}
+        </span>
         <span className="text-xs text-light-3">@{follower?.username}</span>
       </div>
       <div className="ml-auto flex gap-2">
-        <Button type="button" onClick={onAccept} disabled={isAccepting}>Accept</Button>
-        <Button type="button" onClick={onDecline} disabled={isDeclining}>Decline</Button>
+        <Button type="button" onClick={onAccept} disabled={isAccepting}>
+          Accept
+        </Button>
+        <Button type="button" onClick={onDecline} disabled={isDeclining}>
+          Decline
+        </Button>
       </div>
     </div>
   );

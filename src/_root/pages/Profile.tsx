@@ -27,7 +27,6 @@ import {
   Loader,
   FollowRequestCard,
   FollowListDialog,
-  FollowRequestList,
 } from "@/components/shared";
 
 interface StatBlockProps {
