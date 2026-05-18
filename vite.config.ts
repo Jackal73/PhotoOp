@@ -4,16 +4,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-    proxy: {
-      "/v1": {
-        target: "https://fra.cloud.appwrite.io",
-        changeOrigin: true,
-        secure: true,
-        cookieDomainRewrite: "localhost",
-      },
-    },
-  },
+  // No proxy needed for Appwrite Cloud
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -43,6 +43,8 @@ const UserCard = ({ user }: UserCardProps) => {
     } else {
       // Send follow request
       setLocalStatus("pending");
+      console.log("Current user ID (followerId):", currentUser.id);
+      console.log("Target user ID (followingId):", user.$id);
       follow({ followerId: currentUser.id, followingId: user.$id });
     }
   };

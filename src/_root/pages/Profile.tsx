@@ -27,6 +27,7 @@ import {
   Loader,
   FollowRequestCard,
   FollowListDialog,
+  FollowRequestList,
 } from "@/components/shared";
 
 interface StatBlockProps {
@@ -103,6 +104,8 @@ const Profile = () => {
       });
     } else {
       setLocalStatus("pending");
+      console.log("Current user ID (followerId):", user.id);
+      console.log("Target user ID (followingId):", id);
       follow({ followerId: user.id, followingId: id || "" });
     }
   };
@@ -148,7 +151,7 @@ const Profile = () => {
             </div>
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
-              <StatBlock value={currentUser.posts?.length || 0} label="Posts" />
+              <StatBlock value={userPosts.length} label="Posts" />
               <StatBlock
                 value={followerDocs.length}
                 label="Followers"
@@ -247,12 +250,6 @@ const Profile = () => {
             to={`/profile/${id}/liked-posts`}
             className={`profile-tab rounded-r-lg ${pathname === `/profile/${id}/liked-posts` && "!bg-dark-3"}`}
           >
-            <img
-              src={"/assets/icons/like.svg"}
-              alt="like"
-              width={20}
-              height={20}
-            />
             Liked Posts
           </Link>
         </div>

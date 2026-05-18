@@ -1,6 +1,6 @@
+
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-
 import { appwriteConfig, client } from "@/lib/appwrite/config";
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 
@@ -21,6 +21,9 @@ export default function useChatRealtime({
     if (!enabled || !userId || !appwriteConfig.chatCollectionId) return;
 
     const channel = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.chatCollectionId}.documents`;
+    // Minimal debug logging
+    // eslint-disable-next-line no-console
+    console.log("[useChatRealtime] userId:", userId, "channel:", channel);
 
     const unsubscribe = client.subscribe(channel, () => {
       queryClient.invalidateQueries({
@@ -38,6 +41,8 @@ export default function useChatRealtime({
     });
 
     return () => {
+      // eslint-disable-next-line no-console
+      console.log("[useChatRealtime] unsubscribed from channel:", channel);
       unsubscribe();
     };
   }, [enabled, userId, partnerId, queryClient]);

@@ -155,7 +155,7 @@ export async function getAccount() {
 export async function getCurrentUser() {
   try {
     const currentAccount = await getAccount();
-
+    console.log("[getCurrentUser] Appwrite session user:", currentAccount);
     if (!currentAccount) {
       return null;
     }
@@ -1037,11 +1037,9 @@ export async function createChatMessage(message: INewChatMessage) {
         isRead: false,
       },
       [
-        Permission.read(Role.user(currentAccount.$id)),
-        Permission.read(Role.user(receiverAccountId)),
-        Permission.update(Role.user(currentAccount.$id)),
-        Permission.update(Role.user(receiverAccountId)),
-        Permission.delete(Role.user(currentAccount.$id)),
+        Permission.read(Role.users()),
+        Permission.update(Role.users()),
+        Permission.delete(Role.users()),
       ],
     );
 
@@ -1306,17 +1304,34 @@ export async function deleteReel(reelId: string, videoId?: string) {
 // ============================== FOLLOW USER (creates a pending request)
 export async function followUser(followerId: string, followingId: string) {
   try {
+    // Prevent self-follow
+    if (followerId === followingId)
+      throw new Error("You cannot follow yourself.");
+
+    // Check for existing follow document
+    const existing = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      [
+        Query.equal("followerId", followerId),
+        Query.equal("followingId", followingId),
+        Query.limit(1),
+      ],
+    );
+    if (existing.documents.length > 0) {
+      throw new Error("Follow request already exists.");
+    }
+
+    // Create follow request with only read permission for users (creation must match collection-level permission)
     const follow = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.followsCollectionId,
       ID.unique(),
       { followerId, followingId, status: "pending" },
       [
-        Permission.read(Role.any()),
-        Permission.update(`user:${followingId}`), // target can accept/decline
-        Permission.delete(`user:${followerId}`), // sender can cancel
-        Permission.delete(`user:${followingId}`), // target can decline
-      ],
+        Permission.read(Role.users()),
+        Permission.write(Role.users()),
+      ]
     );
     return follow;
   } catch (error: any) {
@@ -1326,7 +1341,11 @@ export async function followUser(followerId: string, followingId: string) {
 }
 
 // ============================== UNFOLLOW / CANCEL REQUEST
-export async function unfollowUser(followDocumentId: string) {
+export async function unfollowUser(
+  followDocumentId: string,
+  followerId: string,
+  followingId: string,
+) {
   try {
     await databases.deleteDocument(
       appwriteConfig.databaseId,

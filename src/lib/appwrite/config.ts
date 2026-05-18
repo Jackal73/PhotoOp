@@ -18,13 +18,9 @@ export const appwriteConfig = {
 export const client = new Client();
 
 // Runtime check for VITE_APPWRITE_URL
-if (
-  !appwriteConfig.url ||
-  appwriteConfig.url === "/v1" ||
-  appwriteConfig.url === "http://localhost:5173/v1"
-) {
+if (!appwriteConfig.url) {
   throw new Error(
-    "[Appwrite] VITE_APPWRITE_URL is missing or invalid! Check your Vercel environment variables.",
+    "[Appwrite] VITE_APPWRITE_URL is missing! Check your environment variables.",
   );
 }
 

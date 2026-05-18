@@ -19,9 +19,15 @@ import SignupForm from "@/_auth/forms/SignupForm";
 import SigninForm from "@/_auth/forms/SigninForm";
 import { Toaster } from "@/components/ui/toaster";
 
+
+import { useEffect } from "react";
+import { testAppwriteSession } from "@/lib/appwrite/testSession";
 import "./globals.css";
 
 const App = () => {
+  useEffect(() => {
+    testAppwriteSession();
+  }, []);
   return (
     <main className="flex h-screen">
       <Routes>

@@ -38,7 +38,7 @@ const LikedPosts = ({ liked }: LikedPostsProps) => {
       </div>
     );
 
-  return <GridPostList posts={posts} showStats={false} />;
+  return <GridPostList posts={posts} showStats={true} />;
 };
 
 export default LikedPosts;
