@@ -25,22 +25,10 @@ export default function useChatRealtime({
     // Debug logging
     console.log("[useChatRealtime] userId:", userId, "channel:", channel);
 
-    // Listen for Appwrite Realtime connection events
-    const ws = client.client?.realtime?.connection;
-    if (ws) {
-      ws.onopen = () => {
-        setConnectionState("connected");
-        console.log("[useChatRealtime] Realtime connected");
-      };
-      ws.onclose = () => {
-        setConnectionState("disconnected");
-        console.warn("[useChatRealtime] Realtime disconnected");
-      };
-      ws.onerror = (e) => {
-        setConnectionState("error");
-        console.error("[useChatRealtime] Realtime error", e);
-      };
-    }
+    // Appwrite JS SDK does not expose direct WebSocket connection events in the public API.
+    // If you want to track connection state, you may need to rely on subscribe/unsubscribe or SDK events if available.
+    // We'll just set connected on subscribe for now.
+    setConnectionState("connected");
 
     const unsubscribe = client.subscribe(channel, () => {
       queryClient.invalidateQueries({
@@ -53,7 +41,7 @@ export default function useChatRealtime({
       // Invalidate all open chat message queries for this user
       const queries = queryClient
         .getQueryCache()
-        .findAll([QUERY_KEYS.GET_CHAT_MESSAGES, userId]);
+        .findAll({ queryKey: [QUERY_KEYS.GET_CHAT_MESSAGES, userId] });
       queries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query.queryKey });
       });
@@ -62,11 +50,7 @@ export default function useChatRealtime({
     return () => {
       console.log("[useChatRealtime] unsubscribed from channel:", channel);
       unsubscribe();
-      if (ws) {
-        ws.onopen = null;
-        ws.onclose = null;
-        ws.onerror = null;
-      }
+      setConnectionState("disconnected");
     };
   }, [enabled, userId, partnerId, queryClient]);
 
