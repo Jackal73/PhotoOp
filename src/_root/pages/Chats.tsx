@@ -322,9 +322,9 @@ const Chats = () => {
         </div>
 
         <div
-          className="flex-1 overflow-y-auto px-4 py-5 space-y-3 pb-32 md:pb-5"
+          className="flex-1 overflow-y-auto px-4 py-5 space-y-3 pb-14 md:pb-5"
           style={{
-            paddingBottom: "6.5rem", // enough for input + bottom bar on mobile
+            paddingBottom: "2.5rem", // even tighter
           }}
         >
           {!selectedPartnerId ? (
@@ -378,7 +378,7 @@ const Chats = () => {
 
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-dark-4 p-4 mb-20 md:mb-0"
+          className="border-t border-dark-4 p-4 mb-2 md:mb-0"
         >
           <div className="flex items-center gap-3">
             <Input
