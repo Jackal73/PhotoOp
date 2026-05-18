@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/components/ui";
 import { useUserContext } from "@/context/AuthContext";
@@ -87,6 +87,16 @@ const Chats = () => {
     : null;
   const messages = messagesData?.documents || [];
 
+  // Ref for the chat messages container
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messages.length, selectedPartnerId]);
+
   useEffect(() => {
     if (!selectedPartnerId && filteredConversations.length > 0) {
       setSelectedPartnerId(filteredConversations[0].partnerId);
@@ -140,8 +150,8 @@ const Chats = () => {
   };
 
   return (
-    <section className="w-full flex flex-1 overflow-hidden">
-      <div className="hidden md:flex w-[320px] border-r border-dark-4 flex-col">
+    <section className="w-full flex flex-1 overflow-hidden h-screen">
+      <div className="hidden md:flex w-[320px] border-r border-dark-4 flex-col min-h-0 h-full">
         <div className="p-5 border-b border-dark-4">
           <h2 className="h3-bold md:h2-bold text-light-1">Chats</h2>
           <p className="small-regular text-light-3 mt-1">Real-time messages</p>
@@ -162,7 +172,7 @@ const Chats = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="px-5 py-3 border-b border-dark-4">
             <p className="small-medium text-light-3 uppercase tracking-wide">
               Conversations
@@ -266,7 +276,7 @@ const Chats = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 h-full">
         <div className="md:hidden border-b border-dark-4 px-4 py-3">
           <select
             value={selectedPartnerId}
@@ -311,7 +321,12 @@ const Chats = () => {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
+        <div
+          className="flex-1 overflow-y-auto px-4 py-5 space-y-3 pb-4 md:pb-5"
+          style={{
+            paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
+          }}
+        >
           {!selectedPartnerId ? (
             <p className="small-regular text-light-4">
               Choose a user to start chatting.
@@ -321,40 +336,43 @@ const Chats = () => {
               No messages yet. Say hello.
             </p>
           ) : (
-            messages.map((message) => {
-              const senderId =
-                typeof message.sender === "string"
-                  ? message.sender
-                  : message.sender?.$id;
-              const isMine = senderId === user.id;
+            <>
+              {messages.map((message) => {
+                const senderId =
+                  typeof message.sender === "string"
+                    ? message.sender
+                    : message.sender?.$id;
+                const isMine = senderId === user.id;
 
-              return (
-                <div
-                  key={message.$id}
-                  className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-                >
+                return (
                   <div
-                    className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                      isMine
-                        ? "bg-primary-500 text-white"
-                        : "bg-dark-4 text-light-1"
-                    }`}
+                    key={message.$id}
+                    className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                   >
-                    <p className="small-medium whitespace-pre-wrap">
-                      {message.text}
-                    </p>
-                    <p
-                      className={`mt-1 text-[11px] ${isMine ? "text-white/80" : "text-light-4"}`}
+                    <div
+                      className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                        isMine
+                          ? "bg-primary-500 text-white"
+                          : "bg-dark-4 text-light-1"
+                      }`}
                     >
-                      {new Date(message.$createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
+                      <p className="small-medium whitespace-pre-wrap">
+                        {message.text}
+                      </p>
+                      <p
+                        className={`mt-1 text-[11px] ${isMine ? "text-white/80" : "text-light-4"}`}
+                      >
+                        {new Date(message.$createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </>
           )}
         </div>
 

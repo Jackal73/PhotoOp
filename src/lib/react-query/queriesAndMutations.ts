@@ -504,6 +504,7 @@ export const useGetConversationMessages = (
     enabled: !!userId && !!partnerId && enabled,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
+    refetchInterval: 2000, // Poll every 2 seconds for robust real-time
   });
 };
 
