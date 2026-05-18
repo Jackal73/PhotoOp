@@ -488,6 +488,8 @@ export const useGetChatConversations = (userId: string, enabled = true) => {
     queryKey: [QUERY_KEYS.GET_CHAT_CONVERSATIONS, userId],
     queryFn: () => getChatConversations(userId),
     enabled: !!userId && enabled,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
 
@@ -500,6 +502,8 @@ export const useGetConversationMessages = (
     queryKey: [QUERY_KEYS.GET_CHAT_MESSAGES, userId, partnerId],
     queryFn: () => getConversationMessages(userId, partnerId),
     enabled: !!userId && !!partnerId && enabled,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
 
