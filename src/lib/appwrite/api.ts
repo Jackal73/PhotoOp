@@ -609,6 +609,7 @@ export async function likePost(
           createdAt: new Date().toISOString(),
           read: false,
         },
+        [Permission.read(Role.user(post.creator))],
       );
     }
 
