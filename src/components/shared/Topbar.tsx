@@ -6,7 +6,7 @@ import { useUserContext } from "@/context/AuthContext";
 import NotificationTabBadge from "./NotificationTabBadge";
 
 const Topbar = () => {
-  const { mutate: signOut, isSuccess } = useSignOutAccount();
+  const { isSuccess } = useSignOutAccount();
   const { user } = useUserContext();
   const navigate = useNavigate();
 
