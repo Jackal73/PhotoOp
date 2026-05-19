@@ -176,7 +176,7 @@ const ReelsBar = () => {
   return (
     <>
       <div className="sticky top-0 z-40 w-full border-b border-dark-4 bg-dark-1/95 backdrop-blur">
-        <div className="flex items-start gap-3 overflow-x-auto px-4 py-4 custom-scrollbar">
+        <div className="flex items-start gap-3 px-4 py-4 overflow-x-hidden">
           <div className="shrink-0 w-[72px] flex flex-col items-center gap-1">
             <div className="relative h-16 w-16 flex items-center justify-center">
               <span

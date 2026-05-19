@@ -51,12 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: currentAccount.email,
           imageUrl: currentAccount.imageUrl,
           bio: currentAccount.bio,
+          notificationPreferences: currentAccount.notificationPreferences || {
+            likes: true,
+            comments: true,
+            follows: true,
+            messages: true,
+          },
         });
         setIsAuthenticated(true);
-
         return true;
       }
-
       return false;
     } catch (error) {
       console.error(error);
@@ -68,7 +72,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const cookieFallback = localStorage.getItem("cookieFallback");
-    if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) {
+    if (
+      cookieFallback === "[]" ||
+      cookieFallback === null ||
+      cookieFallback === undefined
+    ) {
       navigate("/sign-in");
     }
 

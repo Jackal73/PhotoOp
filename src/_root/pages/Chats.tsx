@@ -276,57 +276,56 @@ const Chats = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0 h-full">
-        <div className="md:hidden border-b border-dark-4 px-4 py-3">
-          <select
-            value={selectedPartnerId}
-            onChange={(e) => setSelectedPartnerId(e.target.value)}
-            className="w-full rounded-md bg-dark-4 text-light-1 px-3 py-2 outline-none"
-          >
-            <option value="">Select user to chat</option>
-            {filteredUsers.map((partner) => {
-              return (
-                <option key={partner.$id} value={partner.$id}>
-                  {partner?.name || "Unknown user"}
-                </option>
-              );
-            })}
-          </select>
+      {/* Chat area: header (never scrolls), messages (scroll), input (never scrolls) */}
+      <div className="flex flex-col flex-1 min-h-0">
+        {/* Sticky header for mobile: user selector and user info, always visible */}
+        <div className="shrink-0 bg-dark-1">
+          <div className="md:hidden border-b border-dark-4 px-4 py-3 mt-4">
+            <select
+              value={selectedPartnerId}
+              onChange={(e) => setSelectedPartnerId(e.target.value)}
+              className="w-full rounded-md bg-dark-4 text-light-1 px-3 py-2 outline-none"
+            >
+              <option value="">Select user to chat</option>
+              {filteredUsers.map((partner) => {
+                return (
+                  <option key={partner.$id} value={partner.$id}>
+                    {partner?.name || "Unknown user"}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="border-b border-dark-4 px-4 py-3 flex items-center gap-3">
+            {selectedPartner ? (
+              <>
+                <img
+                  src={
+                    selectedPartner.imageUrl ||
+                    "/assets/icons/profile-placeholder.svg"
+                  }
+                  alt={selectedPartner.name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+                <div>
+                  <p className="base-medium text-light-1">
+                    {selectedPartner.name}
+                  </p>
+                  <p className="small-regular text-light-3">
+                    @{selectedPartner.username}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="small-medium text-light-3">
+                Select a conversation to start chatting.
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="border-b border-dark-4 px-4 py-3 flex items-center gap-3">
-          {selectedPartner ? (
-            <>
-              <img
-                src={
-                  selectedPartner.imageUrl ||
-                  "/assets/icons/profile-placeholder.svg"
-                }
-                alt={selectedPartner.name}
-                className="h-10 w-10 rounded-full object-cover"
-              />
-              <div>
-                <p className="base-medium text-light-1">
-                  {selectedPartner.name}
-                </p>
-                <p className="small-regular text-light-3">
-                  @{selectedPartner.username}
-                </p>
-              </div>
-            </>
-          ) : (
-            <p className="small-medium text-light-3">
-              Select a conversation to start chatting.
-            </p>
-          )}
-        </div>
-
-        <div
-          className="flex-1 overflow-y-auto px-4 py-5 space-y-3 pb-14 md:pb-5"
-          style={{
-            paddingBottom: "2.5rem", // even tighter
-          }}
-        >
+        {/* Messages list: scrollable, fills available space */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-3">
           {!selectedPartnerId ? (
             <p className="small-regular text-light-4">
               Choose a user to start chatting.
@@ -388,7 +387,7 @@ const Chats = () => {
 
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-dark-4 p-4 mb-16 md:mb-0"
+          className="border-t border-dark-4 pt-4 pr-4 pl-4 pb-1 shrink-0 md:mb-4"
         >
           <div className="flex items-center gap-3">
             <Input

@@ -12,6 +12,8 @@ import {
   Saved,
   UpdateProfile,
   Chats,
+  Settings,
+  Notifications,
 } from "@/_root/pages";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
@@ -31,6 +33,7 @@ const App = () => {
     <main className="flex h-screen">
       <Routes>
         {/* public routes */}
+
         <Route element={<AuthLayout />}>
           <Route path="/sign-in" element={<SigninForm />} />
           <Route path="/sign-up" element={<SignupForm />} />
@@ -43,6 +46,7 @@ const App = () => {
           <Route path="/saved" element={<Saved />} />
           <Route path="/reels" element={<Reels />} />
           <Route path="/chats" element={<Chats />} />
+          <Route path="/notifications" element={<Notifications />} />
 
           <Route path="/all-users" element={<AllUsers />} />
           <Route path="/create-post" element={<CreatePost />} />
@@ -50,6 +54,7 @@ const App = () => {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
 

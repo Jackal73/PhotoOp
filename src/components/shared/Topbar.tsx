@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
-import ChatNotificationIcon from "./ChatNotificationIcon";
+// import ChatNotificationIcon from "./ChatNotificationIcon";
+import NotificationTabBadge from "./NotificationTabBadge";
 
 const Topbar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -18,24 +19,26 @@ const Topbar = () => {
     <section className="topbar">
       <div className="flex-between py-4 px-5">
         <Link to="/" className="flex gap-3 items-center">
-          <img
-            src="/assets/images/PhotoOp-1.svg"
-            alt="logo"
-            width={150}
-            height={325}
-          />
+          <img src="/assets/images/PhotoOp-1.svg" alt="logo" width={150} />
         </Link>
-        <div className="flex gap-4">
-          <Link to="/chats" className="flex items-center">
-            <ChatNotificationIcon size={20} />
+        <div className="flex gap-6">
+          <Link to="/notifications" className="flex items-center relative">
+            <img
+              src="/assets/icons/bell.svg"
+              alt="Notifications"
+              width={22}
+              height={22}
+            />
+            <NotificationTabBadge />
           </Link>
-          <Button
-            variant="ghost"
-            className="shad-button_ghost"
-            onClick={() => signOut()}
-          >
-            <img src="/assets/icons/logout.svg" alt="logout" />
-          </Button>
+          <Link to="/settings" className="flex items-center">
+            <img
+              src="/assets/icons/settings.png"
+              alt="Settings"
+              width={22}
+              height={22}
+            />
+          </Link>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
             <img
               src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}

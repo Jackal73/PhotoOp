@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { bottombarLinks } from "@/constants";
 import ChatNotificationIcon from "./ChatNotificationIcon";
+import NotificationTabBadge from "./NotificationTabBadge";
 
 const Bottombar = () => {
   const { pathname } = useLocation();
@@ -14,24 +15,24 @@ const Bottombar = () => {
           <Link
             key={`bottombar-${link.label}`}
             to={link.route}
-            className={`${isActive && "rounded-[10px] bg-primary-500"} flex-center flex-col gap-1 p-2 transition`}
+            className={`flex-center flex-col gap-1 p-2 transition${isActive ? " rounded-[10px] bg-primary-500" : ""}`}
           >
             {link.route === "/chats" ? (
               <ChatNotificationIcon
-                size={16}
+                size={22}
                 className={`${isActive ? "[&>img]:invert-white" : ""}`}
               />
             ) : (
               <img
                 src={link.imgURL}
                 alt={link.label}
-                width={16}
-                height={16}
+                width={22}
+                height={22}
                 className={`${isActive && "invert-white"}`}
               />
             )}
 
-            <p className="tiny-medium text-light-2">{link.label}</p>
+            <p className="text-sm text-light-2 font-semibold">{link.label}</p>
           </Link>
         );
       })}

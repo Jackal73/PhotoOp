@@ -4,6 +4,13 @@ export type INavLink = {
   label: string;
 };
 
+export type NotificationPreferences = {
+  likes: boolean;
+  comments: boolean;
+  follows: boolean;
+  messages: boolean;
+};
+
 export type IUpdateUser = {
   userId: string;
   name: string;
@@ -11,6 +18,7 @@ export type IUpdateUser = {
   imageId: string;
   imageUrl: URL | string;
   file: File[];
+  notificationPreferences?: NotificationPreferences;
 };
 
 export type INewPost = {
@@ -38,6 +46,7 @@ export type IUser = {
   email: string;
   imageUrl: string;
   bio: string;
+  notificationPreferences?: NotificationPreferences;
 };
 
 export type INewUser = {

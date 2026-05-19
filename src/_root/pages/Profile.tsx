@@ -127,7 +127,7 @@ const Profile = () => {
     );
 
   return (
-    <div className="profile-container">
+    <div className="profile-container md:pb-5">
       <div className="profile-inner_container">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7">
           <img

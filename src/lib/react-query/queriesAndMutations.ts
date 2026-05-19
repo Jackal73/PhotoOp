@@ -1,6 +1,18 @@
+import { INotification } from "@/types/notification";
+import {
+  IChatConversation,
+  IComment,
+  INewChatMessage,
+  INewReel,
+  INewPost,
+  IShareEvent,
+  INewUser,
+  IUpdatePost,
+  IUpdateReel,
+  IUpdateUser,
+} from "@/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import {
   createReel,
@@ -48,19 +60,35 @@ import {
   getFollowers,
   getPendingFollowRequests,
   getUsersByIds,
+  getUnreadNotificationsCount,
+  getNotifications,
 } from "@/lib/appwrite/api";
-import {
-  IChatConversation,
-  IComment,
-  INewChatMessage,
-  INewReel,
-  INewPost,
-  IShareEvent,
-  INewUser,
-  IUpdatePost,
-  IUpdateReel,
-  IUpdateUser,
-} from "@/types";
+// ...existing code...
+
+// Unread app notifications count
+export const useGetUnreadNotificationsCount = (
+  userId: string,
+  enabled = true,
+) => {
+  return useQuery<number>({
+    queryKey: ["unread_notifications_count", userId],
+    queryFn: () => getUnreadNotificationsCount(userId),
+    enabled: !!userId && enabled,
+    refetchInterval: 30000,
+  });
+};
+
+// NOTIFICATION QUERIES
+export const useGetNotifications = (userId: string, enabled = true) => {
+  return useQuery<INotification[]>({
+    queryKey: ["notifications", userId],
+    queryFn: () => getNotifications(userId),
+    enabled: !!userId && enabled,
+    refetchInterval: 30000,
+  });
+};
+
+// ...existing code...
 
 // ============================================================
 // AUTH QUERIES

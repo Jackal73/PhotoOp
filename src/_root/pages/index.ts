@@ -10,3 +10,5 @@ export { default as AllUsers } from "./AllUsers";
 export { default as LikedPosts } from "./LikedPosts";
 export { default as Reels } from "./Reels";
 export { default as Chats } from "./Chats";
+export { default as Settings } from "./Settings";
+export { default as Notifications } from "./Notifications";

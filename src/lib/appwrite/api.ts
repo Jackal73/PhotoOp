@@ -1,3 +1,47 @@
+// ============================== GET UNREAD NOTIFICATIONS COUNT
+export async function getUnreadNotificationsCount(
+  userId: string,
+): Promise<number> {
+  const res = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.notificationsCollectionId,
+    [Query.equal("userId", userId), Query.equal("read", false), Query.limit(1)],
+  );
+  return res.total || 0;
+}
+
+import { INotification } from "@/types/notification";
+import { ID, Permission, Query, Role } from "appwrite";
+import { appwriteConfig, account, databases, storage, avatars } from "./config";
+import {
+  IChatConversation,
+  IComment,
+  INewChatMessage,
+  INewReel,
+  IUpdateReel,
+  IShareEvent,
+  IUpdatePost,
+  INewPost,
+  INewUser,
+  IUpdateUser,
+} from "@/types";
+
+// ============================== NOTIFICATIONS API
+export async function getNotifications(
+  userId: string,
+): Promise<INotification[]> {
+  const res = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.notificationsCollectionId,
+    [
+      Query.equal("userId", userId),
+      Query.orderDesc("createdAt"),
+      Query.limit(50),
+    ],
+  );
+  return res.documents as unknown as INotification[];
+}
+
 // ============================== CREATE POST
 export async function createPost(post: INewPost) {
   try {
@@ -40,21 +84,6 @@ export async function createPost(post: INewPost) {
     console.log(error);
   }
 }
-import { ID, Permission, Query, Role } from "appwrite";
-
-import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import {
-  IChatConversation,
-  IComment,
-  INewChatMessage,
-  INewReel,
-  IUpdateReel,
-  IShareEvent,
-  IUpdatePost,
-  INewPost,
-  INewUser,
-  IUpdateUser,
-} from "@/types";
 
 // ============================================================
 // AUTH
@@ -552,6 +581,37 @@ export async function likePost(
 
     if (!updatedPost) throw Error;
 
+    // --- Notification logic ---
+    // Fetch the post to get its creator
+    const post = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId,
+    );
+    // Only notify if the liker is not the post owner
+    if (
+      post &&
+      userId &&
+      post.creator !== userId &&
+      likesArray.includes(userId)
+    ) {
+      // Create notification for the post owner
+      const message = `Someone liked your post.`;
+      await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.notificationsCollectionId,
+        ID.unique(),
+        {
+          userId: post.creator,
+          type: "like",
+          message,
+          link: `/post/${postId}`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        },
+      );
+    }
+
     return updatedPost;
   } catch (error) {
     console.log(error);
@@ -702,16 +762,20 @@ export async function updateUser(user: IUpdateUser) {
     }
 
     //  Update user
+    const updatePayload: any = {
+      name: user.name,
+      bio: user.bio,
+      imageUrl: image.imageUrl,
+      imageId: image.imageId,
+    };
+    if (user.notificationPreferences) {
+      updatePayload.notificationPreferences = user.notificationPreferences;
+    }
     const updatedUser = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
       user.userId,
-      {
-        name: user.name,
-        bio: user.bio,
-        imageUrl: image.imageUrl,
-        imageId: image.imageId,
-      },
+      updatePayload,
     );
 
     // Failed to update

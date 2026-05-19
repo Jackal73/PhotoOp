@@ -51,7 +51,7 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-1 h-full">
+    <div className="flex flex-1 h-full md:pb-5">
       <div className="home-container">
         <div className="home-posts">
           {/* Feed tabs */}
@@ -78,8 +78,15 @@ const Home = () => {
             <Loader />
           ) : feedTab === "following" && displayPosts.length === 0 ? (
             <div className="flex flex-col items-center gap-3 mt-16 text-light-4">
-              <img src="/assets/icons/people.svg" width={48} height={48} className="opacity-40" />
-              <p className="base-medium">Follow people to see their posts here.</p>
+              <img
+                src="/assets/icons/people.svg"
+                width={48}
+                height={48}
+                className="opacity-40"
+              />
+              <p className="base-medium">
+                Follow people to see their posts here.
+              </p>
             </div>
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">
@@ -111,4 +118,3 @@ const Home = () => {
 };
 
 export default Home;
-

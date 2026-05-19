@@ -22,7 +22,9 @@ type CreatorType = "all" | "following" | "verified" | "new";
 type TimeWindow = "all" | "today" | "week" | "month";
 
 const normalizeTag = (tag: string) =>
-  String(tag || "").replace(/^#+/, "").toLowerCase();
+  String(tag || "")
+    .replace(/^#+/, "")
+    .toLowerCase();
 
 const getTimeStart = (window: TimeWindow) => {
   const now = new Date();
@@ -88,13 +90,19 @@ const Explore = () => {
 
   const filteredPosts = allPosts
     .filter((post: any) => {
-      const createdAt = new Date(post?.$createdAt || post?.$updatedAt || Date.now());
+      const createdAt = new Date(
+        post?.$createdAt || post?.$updatedAt || Date.now(),
+      );
       const timeStart = getTimeStart(timeWindow);
       if (timeStart && createdAt < timeStart) return false;
 
       if (selectedTags.length > 0) {
-        const postTags = (post?.tags || []).map((tag: string) => normalizeTag(tag));
-        const hasTag = selectedTags.some((tag) => postTags.includes(normalizeTag(tag)));
+        const postTags = (post?.tags || []).map((tag: string) =>
+          normalizeTag(tag),
+        );
+        const hasTag = selectedTags.some((tag) =>
+          postTags.includes(normalizeTag(tag)),
+        );
         if (!hasTag) return false;
       }
 
@@ -108,7 +116,9 @@ const Explore = () => {
       }
 
       if (creatorType === "new") {
-        const creatorCreatedAt = new Date(post?.creator?.$createdAt || Date.now());
+        const creatorCreatedAt = new Date(
+          post?.creator?.$createdAt || Date.now(),
+        );
         const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         if (creatorCreatedAt < monthAgo) return false;
       }
@@ -127,15 +137,33 @@ const Explore = () => {
       const aLikes = Array.isArray(a?.likes) ? a.likes.length : 0;
       const bLikes = Array.isArray(b?.likes) ? b.likes.length : 0;
 
-      const aComments = getCountMetric(a, ["commentsCount", "commentCount", "comments"]);
-      const bComments = getCountMetric(b, ["commentsCount", "commentCount", "comments"]);
+      const aComments = getCountMetric(a, [
+        "commentsCount",
+        "commentCount",
+        "comments",
+      ]);
+      const bComments = getCountMetric(b, [
+        "commentsCount",
+        "commentCount",
+        "comments",
+      ]);
 
-      const aShares = getCountMetric(a, ["sharesCount", "shareCount", "shares"]);
-      const bShares = getCountMetric(b, ["sharesCount", "shareCount", "shares"]);
+      const aShares = getCountMetric(a, [
+        "sharesCount",
+        "shareCount",
+        "shares",
+      ]);
+      const bShares = getCountMetric(b, [
+        "sharesCount",
+        "shareCount",
+        "shares",
+      ]);
 
       if (feedMode === "latest") return bCreated - aCreated;
-      if (feedMode === "most-discussed") return bComments - aComments || bCreated - aCreated;
-      if (feedMode === "most-shared") return bShares - aShares || bCreated - aCreated;
+      if (feedMode === "most-discussed")
+        return bComments - aComments || bCreated - aCreated;
+      if (feedMode === "most-shared")
+        return bShares - aShares || bCreated - aCreated;
       if (feedMode === "trending") {
         const aScore = aLikes * 2 + aComments * 1.5 + aShares * 2;
         const bScore = bLikes * 2 + bComments * 1.5 + bShares * 2;
@@ -188,7 +216,9 @@ const Explore = () => {
     feedModeLabel !== "All" ? feedModeLabel : null,
     timeWindowLabel,
     creatorTypeLabel,
-    selectedTags.length > 0 ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""}` : null,
+    selectedTags.length > 0
+      ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""}`
+      : null,
   ].filter(Boolean) as string[];
 
   const alwaysVisibleFilterLabel = [
@@ -207,7 +237,9 @@ const Explore = () => {
         : creatorType === "verified"
           ? "Verified Creators"
           : "New Creators",
-    selectedTags.length > 0 ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""}` : null,
+    selectedTags.length > 0
+      ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""}`
+      : null,
   ]
     .filter(Boolean)
     .join(" | ");
@@ -215,11 +247,16 @@ const Explore = () => {
   const activeFilterCount = filterSummaryParts.length;
 
   return (
-    <div className="explore-container">
+    <div className="explore-container md:pb-5">
       <div className="explore-inner_container">
         <h2 className="h3-bold md:h2-bold w-full">Search</h2>
         <div className="flex gap-1 px-4 w-full rounded-lg bg-dark-4">
-          <img src="/assets/icons/search.svg" height={24} width={24} alt="search" />
+          <img
+            src="/assets/icons/search.svg"
+            height={24}
+            width={24}
+            alt="search"
+          />
           <Input
             type="text"
             placeholder="Search caption or #tag"
@@ -259,7 +296,12 @@ const Explore = () => {
           <p className="text-[10px] md:text-xs text-light-3 line-clamp-1 max-w-[320px] text-left">
             {alwaysVisibleFilterLabel}
           </p>
-          <img src="/assets/icons/filter.svg" height={20} width={20} alt="filter" />
+          <img
+            src="/assets/icons/filter.svg"
+            height={20}
+            width={20}
+            alt="filter"
+          />
         </button>
       </div>
 

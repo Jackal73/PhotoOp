@@ -188,7 +188,7 @@
 
   /* Bottom bar */
   .bottom-bar {
-    @apply fixed bottom-0 left-0 right-0 z-50 flex-between w-full rounded-t-[20px] bg-dark-2 px-5 py-4 md:hidden;
+    @apply fixed bottom-0 left-0 right-0 z-50 flex-between w-full rounded-t-[20px] bg-dark-2 px-5 pt-4 pb-1 h-16 md:hidden;
   }
 
   /* File uploader */
@@ -241,20 +241,20 @@
 
   /* Topbar */
   .topbar {
-    @apply sticky top-0 z-50 md:hidden bg-dark-2 w-full;
+    @apply fixed top-0 left-0 right-0 z-50 md:hidden bg-dark-2 w-full;
   }
+}
 
-  /* User card */
-  .user-card {
-    @apply flex-center flex-col gap-4 border border-dark-4 rounded-[20px] px-5 py-8;
-  }
+/* User card */
+.user-card {
+  @apply flex-center flex-col gap-4 border border-dark-4 rounded-[20px] px-5 py-8;
+}
 
-  .comments-container {
-    @apply w-full h-auto overflow-visible;
-  }
-  .comments-dialog {
-    @apply w-full h-auto overflow-visible;
-  }
+.comments-container {
+  @apply w-full h-auto overflow-visible;
+}
+.comments-dialog {
+  @apply w-full h-auto overflow-visible;
 }
 
 @layer components {

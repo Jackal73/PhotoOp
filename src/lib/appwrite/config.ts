@@ -13,6 +13,8 @@ export const appwriteConfig = {
   chatCollectionId: import.meta.env.VITE_APPWRITE_CHAT_COLLECTION_ID,
   reelsCollectionId: import.meta.env.VITE_APPWRITE_REELS_COLLECTION_ID,
   followsCollectionId: import.meta.env.VITE_APPWRITE_FOLLOWS_COLLECTION_ID,
+  notificationsCollectionId: import.meta.env
+    .VITE_APPWRITE_NOTIFICATIONS_COLLECTION_ID,
 };
 
 export const client = new Client();

@@ -47,9 +47,7 @@ const PostCard = ({ post }: PostCardProps) => {
               </p>
             </div>
             <div className="flex-start text-light-3 mt-[-2px]">
-              <p className="subtle-semibold">
-                {post?.location}
-              </p>
+              <p className="subtle-semibold">{post?.location}</p>
             </div>
           </div>
         </div>
@@ -68,8 +66,8 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       <Link to={`/posts/${post.$id}`}>
-        <div className="small-medium lg:base-medium py-5">
-          <p>{post.caption}</p>
+        <div className="text-base py-5">
+          <p className="font-medium">{post.caption}</p>
           <ul className="flex gap-1 mt-2">
             {post.tags.map((tag: string, index: string) => (
               <li key={`${tag}${index}`} className="text-light-3 small-regular">
@@ -94,10 +92,19 @@ const PostCard = ({ post }: PostCardProps) => {
             <div className="flex justify-end mb-2">
               <button
                 type="button"
-                onClick={() => setSortOrder((prev) => prev === "newest" ? "oldest" : "newest")}
-                className="small-regular text-light-4 hover:text-light-2 transition flex items-center gap-1"
+                onClick={() =>
+                  setSortOrder((prev) =>
+                    prev === "newest" ? "oldest" : "newest",
+                  )
+                }
+                className="text-[7px] text-light-4 hover:text-light-2 transition flex items-center gap-1"
               >
-                <img src="/assets/icons/filter.svg" alt="sort" width={14} height={14} />
+                <img
+                  src="/assets/icons/filter.svg"
+                  alt="sort"
+                  width={14}
+                  height={14}
+                />
                 {sortOrder === "newest" ? "Newest first" : "Oldest first"}
               </button>
             </div>
@@ -111,7 +118,7 @@ const PostCard = ({ post }: PostCardProps) => {
             <button
               type="button"
               onClick={() => setShowAllComments((prev) => !prev)}
-              className="ml-2 mt-1 small-regular text-light-4 hover:text-light-2\"
+              className="ml-2 mt-1 text-[7px] text-light-4 hover:text-light-2"
             >
               {showAllComments
                 ? "Hide comments"

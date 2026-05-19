@@ -46,8 +46,8 @@ const CommentCard = ({
   const avatarSizeClass = nestLevel > 0 ? "h-6 w-6" : "h-8 w-8";
   const replyToggleIndentClass = nestLevel > 0 ? "ml-8" : "ml-10";
   const commentSpacingClass = nestLevel > 0 ? "pb-1" : "pb-4";
-  const usernameTextClass = nestLevel > 0 ? "text-xs" : "text-sm";
-  const commentTextClass = nestLevel > 0 ? "text-sm" : "text-base";
+  const usernameTextClass = "text-[7px]";
+  const commentTextClass = "text-[7px]";
   const [showChildReplies, setShowChildReplies] = useState(false);
 
   return (

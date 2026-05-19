@@ -4,6 +4,7 @@ import { INavLink } from "@/types";
 import { sidebarLinks } from "@/constants";
 import { Loader } from "@/components/shared";
 import ChatNotificationIcon from "@/components/shared/ChatNotificationIcon";
+import NotificationTabBadge from "@/components/shared/NotificationTabBadge";
 import { Button } from "@/components/ui/button";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext, INITIAL_USER } from "@/context/AuthContext";
@@ -79,6 +80,15 @@ const LeftSidebar = () => {
                         size={20}
                         className={`${isActive ? "[&>img]:invert-white" : "group-hover:[&>img]:invert-white"}`}
                       />
+                    ) : link.route === "/notifications" ? (
+                      <span className="relative">
+                        <img
+                          src={link.imgURL}
+                          alt={link.label}
+                          className={`group-hover:invert-white ${isActive && "invert-white"}`}
+                        />
+                        <NotificationTabBadge />
+                      </span>
                     ) : (
                       <img
                         src={link.imgURL}
@@ -94,14 +104,18 @@ const LeftSidebar = () => {
           </ul>
         </div>
         <div className="">
-          <Button
-            variant="ghost"
-            className="shad-button_ghost"
-            // onClick={(e) => handleSignOut(e)}
+          <button
+            type="button"
+            onClick={() => navigate("/settings")}
+            className={`leftsidebar-link group flex gap-3 items-center px-4 py-3 w-full justify-start ${pathname === "/settings" ? "bg-primary-500" : ""}`}
           >
-            <img src="/assets/icons/settings.png" alt="logout" />
-            <p className="small-medium lg:base-medium">Settings</p>
-          </Button>
+            <img
+              src="/assets/icons/settings.png"
+              alt="settings"
+              className={`w-6 h-6 group-hover:invert-white ${pathname === "/settings" ? "invert-white" : ""}`}
+            />
+            <span className="body-medium">Settings</span>
+          </button>
           <Button
             variant="ghost"
             className="shad-button_ghost mt-6"
