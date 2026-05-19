@@ -378,7 +378,7 @@ const Chats = () => {
 
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-dark-4 p-4 mb-2 md:mb-0"
+          className="border-t border-dark-4 p-4 mb-16 md:mb-0"
         >
           <div className="flex items-center gap-3">
             <Input
