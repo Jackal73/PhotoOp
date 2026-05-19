@@ -19,7 +19,7 @@ const RootLayout = () => {
 
       {/* Main scrollable content with padding for bars on mobile */}
       <main
-        className="flex flex-1 flex-col min-h-screen overflow-hidden pt-16 pb-20 md:pt-0 md:pb-0"
+        className="flex flex-1 flex-col min-h-screen overflow-auto pt-16 pb-20 md:pt-0 md:pb-0"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {shouldShowReelsBar && <ReelsBar />}

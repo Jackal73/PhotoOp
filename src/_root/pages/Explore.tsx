@@ -247,195 +247,199 @@ const Explore = () => {
   const activeFilterCount = filterSummaryParts.length;
 
   return (
-    <div className="explore-container md:pb-5">
-      <div className="explore-inner_container">
-        <h2 className="h3-bold md:h2-bold w-full">Search</h2>
-        <div className="flex gap-1 px-4 w-full rounded-lg bg-dark-4">
-          <img
-            src="/assets/icons/search.svg"
-            height={24}
-            width={24}
-            alt="search"
-          />
-          <Input
-            type="text"
-            placeholder="Search caption or #tag"
-            className="explore-search"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </div>
-
-        {popularTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {popularTags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 rounded-full small-medium ${
-                  selectedTags.includes(normalizeTag(tag))
-                    ? "bg-primary-500 text-white"
-                    : "bg-dark-4 text-light-2 hover:bg-dark-3"
-                }`}
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="flex-between w-full max-w-5xl mt-16 mb-7">
-        <h3 className="body-bold md:h3-bold">Popular Today</h3>
-        <button
-          type="button"
-          onClick={() => setShowFilters((prev) => !prev)}
-          className="flex-center gap-3 bg-dark-3 rounded-xl px-4 py-2 cursor-pointer"
-        >
-          <p className="text-[10px] md:text-xs text-light-3 line-clamp-1 max-w-[320px] text-left">
-            {alwaysVisibleFilterLabel}
-          </p>
-          <img
-            src="/assets/icons/filter.svg"
-            height={20}
-            width={20}
-            alt="filter"
-          />
-        </button>
-      </div>
-
-      {activeFilterCount > 0 && (
-        <div className="w-full max-w-5xl mb-4 flex flex-wrap gap-2">
-          {filterSummaryParts.map((part) => (
-            <span
-              key={part}
-              className="px-2 py-1 rounded-full bg-dark-4 text-light-3 text-[10px] md:text-xs"
-            >
-              {part}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {showFilters && (
-        <div className="w-full max-w-5xl mb-7 p-4 rounded-xl bg-dark-3 flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2">
-            {[
-              { key: "all", label: "All" },
-              { key: "trending", label: "Trending" },
-              { key: "latest", label: "Latest" },
-              { key: "following", label: "Following" },
-              { key: "most-discussed", label: "Most Discussed" },
-              { key: "most-shared", label: "Most Shared" },
-            ].map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setFeedMode(option.key as FeedMode)}
-                className={`px-3 py-1 rounded-full small-medium ${
-                  feedMode === option.key
-                    ? "bg-primary-500 text-white"
-                    : "bg-dark-4 text-light-2"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+    <>
+      <div className="explore-container md:pb-5">
+        <div className="explore-inner_container">
+          <h2 className="h3-bold md:h2-bold w-full">Search</h2>
+          <div className="flex gap-1 px-4 w-full rounded-lg bg-dark-4">
+            <img
+              src="/assets/icons/search.svg"
+              height={24}
+              width={24}
+              alt="search"
+            />
+            <Input
+              type="text"
+              placeholder="Search caption or #tag"
+              className="explore-search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {[
-              { key: "all", label: "All Time" },
-              { key: "today", label: "Today" },
-              { key: "week", label: "This Week" },
-              { key: "month", label: "This Month" },
-            ].map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setTimeWindow(option.key as TimeWindow)}
-                className={`px-3 py-1 rounded-full small-medium ${
-                  timeWindow === option.key
-                    ? "bg-primary-500 text-white"
-                    : "bg-dark-4 text-light-2"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {[
-              { key: "all", label: "All Creators" },
-              { key: "following", label: "Following" },
-              { key: "verified", label: "Verified" },
-              { key: "new", label: "New Creators" },
-            ].map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setCreatorType(option.key as CreatorType)}
-                className={`px-3 py-1 rounded-full small-medium ${
-                  creatorType === option.key
-                    ? "bg-primary-500 text-white"
-                    : "bg-dark-4 text-light-2"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          {selectedTags.length > 0 && (
-            <div className="flex items-center gap-2">
-              <p className="small-regular text-light-3">Active tags:</p>
-              <div className="flex flex-wrap gap-2">
-                {selectedTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 rounded-full bg-primary-500/20 text-primary-500 small-medium"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedTags([])}
-                className="small-regular text-light-3 hover:text-light-1"
-              >
-                Clear tags
-              </button>
+          {popularTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {popularTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 rounded-full small-medium ${
+                    selectedTags.includes(normalizeTag(tag))
+                      ? "bg-primary-500 text-white"
+                      : "bg-dark-4 text-light-2 hover:bg-dark-3"
+                  }`}
+                >
+                  #{tag}
+                </button>
+              ))}
             </div>
           )}
         </div>
-      )}
 
-      <div className="flex flex-wrap gap-9 w-full max-w-5xl">
-        {shouldShowSearchResults ? (
-          <SearchResults
-            isSearchFetching={isSearchFetching}
-            searchedPosts={searchedPosts}
-          />
-        ) : shouldShowPosts ? (
-          <p className="text-light-4 mt-10 text-center w-full">End of posts</p>
-        ) : filteredPosts.length === 0 ? (
-          <p className="text-light-4 mt-10 text-center w-full">
-            No posts match the selected filters
-          </p>
-        ) : (
-          <GridPostList posts={filteredPosts as any} />
+        <div className="flex-between w-full max-w-5xl mt-16 mb-7">
+          <h3 className="body-bold md:h3-bold">Popular Today</h3>
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="flex-center gap-3 bg-dark-3 rounded-xl px-4 py-2 cursor-pointer"
+          >
+            <p className="text-[10px] md:text-xs text-light-3 line-clamp-1 max-w-[320px] text-left">
+              {alwaysVisibleFilterLabel}
+            </p>
+            <img
+              src="/assets/icons/filter.svg"
+              height={20}
+              width={20}
+              alt="filter"
+            />
+          </button>
+        </div>
+
+        {activeFilterCount > 0 && (
+          <div className="w-full max-w-5xl mb-4 flex flex-wrap gap-2">
+            {filterSummaryParts.map((part) => (
+              <span
+                key={part}
+                className="px-2 py-1 rounded-full bg-dark-4 text-light-3 text-[10px] md:text-xs"
+              >
+                {part}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {showFilters && (
+          <div className="w-full max-w-5xl mb-7 p-4 rounded-xl bg-dark-3 flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              {[
+                { key: "all", label: "All" },
+                { key: "trending", label: "Trending" },
+                { key: "latest", label: "Latest" },
+                { key: "following", label: "Following" },
+                { key: "most-discussed", label: "Most Discussed" },
+                { key: "most-shared", label: "Most Shared" },
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => setFeedMode(option.key as FeedMode)}
+                  className={`px-3 py-1 rounded-full small-medium ${
+                    feedMode === option.key
+                      ? "bg-primary-500 text-white"
+                      : "bg-dark-4 text-light-2"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {[
+                { key: "all", label: "All Time" },
+                { key: "today", label: "Today" },
+                { key: "week", label: "This Week" },
+                { key: "month", label: "This Month" },
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => setTimeWindow(option.key as TimeWindow)}
+                  className={`px-3 py-1 rounded-full small-medium ${
+                    timeWindow === option.key
+                      ? "bg-primary-500 text-white"
+                      : "bg-dark-4 text-light-2"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {[
+                { key: "all", label: "All Creators" },
+                { key: "following", label: "Following" },
+                { key: "verified", label: "Verified" },
+                { key: "new", label: "New Creators" },
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => setCreatorType(option.key as CreatorType)}
+                  className={`px-3 py-1 rounded-full small-medium ${
+                    creatorType === option.key
+                      ? "bg-primary-500 text-white"
+                      : "bg-dark-4 text-light-2"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {selectedTags.length > 0 && (
+              <div className="flex items-center gap-2">
+                <p className="small-regular text-light-3">Active tags:</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 rounded-full bg-primary-500/20 text-primary-500 small-medium"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTags([])}
+                  className="small-regular text-light-3 hover:text-light-1"
+                >
+                  Clear tags
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-9 w-full max-w-5xl">
+          {shouldShowSearchResults ? (
+            <SearchResults
+              isSearchFetching={isSearchFetching}
+              searchedPosts={searchedPosts}
+            />
+          ) : shouldShowPosts ? (
+            <p className="text-light-4 mt-10 text-center w-full">
+              End of posts
+            </p>
+          ) : filteredPosts.length === 0 ? (
+            <p className="text-light-4 mt-10 text-center w-full">
+              No posts match the selected filters
+            </p>
+          ) : (
+            <GridPostList posts={filteredPosts as any} />
+          )}
+        </div>
+
+        {hasNextPage && !searchValue && (
+          <div ref={ref} className="mt-10">
+            <Loader />
+          </div>
         )}
       </div>
-
-      {hasNextPage && !searchValue && (
-        <div ref={ref} className="mt-10">
-          <Loader />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 

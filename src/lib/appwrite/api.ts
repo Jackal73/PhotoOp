@@ -806,11 +806,11 @@ export async function updateUser(user: IUpdateUser) {
 export async function createComment(comment: IComment) {
   try {
     const currentAccount = await getAccount();
-
     if (!currentAccount) {
       throw new Error("You must be signed in to create a comment.");
     }
 
+    // Create the comment
     const newComment = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.commentCollectionId,
@@ -833,6 +833,61 @@ export async function createComment(comment: IComment) {
     if (!newComment) {
       throw Error;
     }
+
+    // --- Notification logic ---
+    // 1. Notify post owner if this is a root comment (not a reply)
+    if (!comment.parentCommentID) {
+      // Get the post to find the owner
+      const post = await databases.getDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.postCollectionId,
+        comment.postId,
+      );
+      if (post && post.creator !== comment.userId) {
+        const message = `Someone commented on your post.`;
+        await databases.createDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.notificationsCollectionId,
+          ID.unique(),
+          {
+            userId: post.creator,
+            type: "comment",
+            message,
+            link: `/post/${comment.postId}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+          },
+          [Permission.read(Role.user(post.creator))],
+        );
+      }
+    }
+
+    // 2. Notify parent comment owner if this is a reply
+    if (comment.parentCommentID) {
+      const parentComment = await databases.getDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.commentCollectionId,
+        comment.parentCommentID,
+      );
+      if (parentComment && parentComment.user !== comment.userId) {
+        const message = `Someone replied to your comment.`;
+        await databases.createDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.notificationsCollectionId,
+          ID.unique(),
+          {
+            userId: parentComment.user,
+            type: "comment",
+            message,
+            link: `/post/${comment.postId}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+          },
+          [Permission.read(Role.user(parentComment.user))],
+        );
+      }
+    }
+
     return newComment;
   } catch (error) {
     console.log(error);
@@ -878,6 +933,36 @@ export async function likedComment(commentId: string, likesArray: string[]) {
       },
     );
     if (!updateComment) throw Error;
+
+    // --- Notification logic ---
+    // Only notify if the liker is not the comment owner and the like is being added
+    // likesArray is the new array, so we need to find the user who just liked
+    // (Assume the last user in likesArray is the new liker)
+    if (likesArray.length > 0) {
+      const likerId = likesArray[likesArray.length - 1];
+      const comment = await databases.getDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.commentCollectionId,
+        commentId,
+      );
+      if (comment && comment.user !== likerId && likesArray.includes(likerId)) {
+        const message = `Someone liked your comment.`;
+        await databases.createDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.notificationsCollectionId,
+          ID.unique(),
+          {
+            userId: comment.user,
+            type: "like",
+            message,
+            link: `/post/${comment.post}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+          },
+          [Permission.read(Role.user(comment.user))],
+        );
+      }
+    }
     return updateComment;
   } catch (error) {
     console.log(error);
@@ -1394,6 +1479,27 @@ export async function followUser(followerId: string, followingId: string) {
       { followerId, followingId, status: "pending" },
       [Permission.read(Role.users()), Permission.write(Role.users())],
     );
+
+    // --- Notification logic ---
+    // Notify the user being followed
+    if (followingId !== followerId) {
+      const message = `Someone requested to follow you.`;
+      await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.notificationsCollectionId,
+        ID.unique(),
+        {
+          userId: followingId,
+          type: "follow",
+          message,
+          link: `/profile/${followingId}`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        },
+        [Permission.read(Role.user(followingId))],
+      );
+    }
+
     return follow;
   } catch (error: any) {
     console.error("followUser failed:", error?.message || error);
