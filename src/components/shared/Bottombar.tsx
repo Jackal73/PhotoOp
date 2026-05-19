@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 
 import { bottombarLinks } from "@/constants";
 import ChatNotificationIcon from "./ChatNotificationIcon";
-import NotificationTabBadge from "./NotificationTabBadge";
 
 const Bottombar = () => {
   const { pathname } = useLocation();
