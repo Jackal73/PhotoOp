@@ -351,7 +351,7 @@ const Chats = () => {
                   >
                     {/* Time for sent messages (now on left) */}
                     {isMine && (
-                      <span className="text-[11px] text-light-4 mb-0.5 min-w-[38px] text-right">
+                      <span className="text-[11px] text-light-3 mb-0.5 min-w-[38px] text-right">
                         {new Date(message.$createdAt).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -365,13 +365,13 @@ const Chats = () => {
                           : "bg-dark-4 text-light-1"
                       }`}
                     >
-                      <p className="small-medium whitespace-pre-wrap">
+                      <p className="base-medium whitespace-pre-wrap">
                         {message.text}
                       </p>
                     </div>
                     {/* Time for received messages (now on right) */}
                     {!isMine && (
-                      <span className="text-[11px] text-light-4 mb-0.5 min-w-[38px] text-left">
+                      <span className="text-[11px] text-light-3 mb-0.5 min-w-[38px] text-left">
                         {new Date(message.$createdAt).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
