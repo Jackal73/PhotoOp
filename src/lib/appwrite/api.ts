@@ -29,8 +29,15 @@ export async function getUnreadNotificationsCount(
 }
 
 import { INotification } from "@/types/notification";
-import { ID, Permission, Query, Role } from "appwrite";
-import { appwriteConfig, account, databases, storage, avatars } from "./config";
+import { ID, Permission, Query, Role, Functions } from "appwrite";
+import {
+  appwriteConfig,
+  account,
+  databases,
+  storage,
+  avatars,
+  client,
+} from "./config";
 import {
   IChatConversation,
   IComment,
@@ -613,26 +620,35 @@ export async function likePost(
       post.creator !== userId &&
       likesArray.includes(userId)
     ) {
-      // Create notification for the post owner
+      // Create notification for the post owner using Appwrite Cloud Function
       const message = `Someone liked your post.`;
       try {
-        await databases.createDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.notificationsCollectionId,
-          ID.unique(),
-          {
-            userId: post.creator,
+        const creatorId = post.creator?.accountId;
+        if (
+          !creatorId ||
+          typeof creatorId !== "string" ||
+          creatorId.length !== 20
+        ) {
+          console.error(
+            "[likePost] Invalid post.creator.accountId for notification function:",
+            post.creator,
+          );
+          return updatedPost;
+        }
+        // Call the Appwrite Cloud Function
+        const functions = new Functions(client);
+        await functions.createExecution(
+          "6a0d1d900017743535ba",
+          JSON.stringify({
+            userId: creatorId,
             type: "like",
             message,
             link: `/post/${postId}`,
-            createdAt: new Date().toISOString(),
-            read: false,
-          },
-          [Permission.read(Role.user(post.creator))],
+          }),
         );
       } catch (notifError) {
         console.error(
-          "[likePost] Failed to create like notification:",
+          "[likePost] Failed to trigger notification function:",
           notifError,
         );
       }
@@ -868,23 +884,31 @@ export async function createComment(comment: IComment) {
       if (post && post.creator !== comment.userId) {
         const message = `Someone commented on your post.`;
         try {
-          await databases.createDocument(
-            appwriteConfig.databaseId,
-            appwriteConfig.notificationsCollectionId,
-            ID.unique(),
-            {
-              userId: post.creator,
-              type: "comment",
-              message,
-              link: `/post/${comment.postId}`,
-              createdAt: new Date().toISOString(),
-              read: false,
-            },
-            ["read", `user:${post.creator}`],
-          );
+          const creatorId = post.creator?.accountId || post.creator;
+          if (
+            !creatorId ||
+            typeof creatorId !== "string" ||
+            creatorId.length !== 20
+          ) {
+            console.error(
+              "[createComment] Invalid post.creator.accountId for notification function:",
+              post.creator,
+            );
+          } else {
+            const functions = new Functions(client);
+            await functions.createExecution(
+              "6a0d1d900017743535ba",
+              JSON.stringify({
+                userId: creatorId,
+                type: "comment",
+                message,
+                link: `/post/${comment.postId}`,
+              }),
+            );
+          }
         } catch (notifError) {
           console.error(
-            "[createComment] Failed to create comment notification:",
+            "[createComment] Failed to trigger comment notification function:",
             notifError,
           );
         }
@@ -901,23 +925,32 @@ export async function createComment(comment: IComment) {
       if (parentComment && parentComment.user !== comment.userId) {
         const message = `Someone replied to your comment.`;
         try {
-          await databases.createDocument(
-            appwriteConfig.databaseId,
-            appwriteConfig.notificationsCollectionId,
-            ID.unique(),
-            {
-              userId: parentComment.user,
-              type: "comment",
-              message,
-              link: `/post/${comment.postId}`,
-              createdAt: new Date().toISOString(),
-              read: false,
-            },
-            ["read", `user:${parentComment.user}`],
-          );
+          const parentUserId =
+            parentComment.user?.accountId || parentComment.user;
+          if (
+            !parentUserId ||
+            typeof parentUserId !== "string" ||
+            parentUserId.length !== 20
+          ) {
+            console.error(
+              "[createComment] Invalid parentComment.user.accountId for notification function:",
+              parentComment.user,
+            );
+          } else {
+            const functions = new Functions(client);
+            await functions.createExecution(
+              "6a0d1d900017743535ba",
+              JSON.stringify({
+                userId: parentUserId,
+                type: "comment",
+                message,
+                link: `/post/${comment.postId}`,
+              }),
+            );
+          }
         } catch (notifError) {
           console.error(
-            "[createComment] Failed to create reply notification:",
+            "[createComment] Failed to trigger reply notification function:",
             notifError,
           );
         }
@@ -936,20 +969,24 @@ export async function testNotification(
   message: string = "Test notification",
 ) {
   try {
-    const res = await databases.createDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.notificationsCollectionId,
-      ID.unique(),
-      {
+    if (!userId) {
+      console.error(
+        "[testNotification] No userId provided. User must be logged in.",
+      );
+      throw new Error("User not authenticated. Please log in.");
+    }
+    // Use Appwrite Cloud Function for test notification
+    const functions = new Functions(client);
+    await functions.createExecution(
+      "6a0d1d900017743535ba",
+      JSON.stringify({
         userId,
         type: "system",
         message,
         link: "/",
-        read: false,
-      },
+      }),
     );
-    console.log("[testNotification] Notification created:", res);
-    return res;
+    return { status: "ok" };
   } catch (error) {
     console.error(
       "[testNotification] Failed to create test notification:",
@@ -1021,7 +1058,6 @@ export async function likedComment(commentId: string, likesArray: string[]) {
             type: "like",
             message,
             link: `/post/${comment.post}`,
-            createdAt: new Date().toISOString(),
             read: false,
           },
           [Permission.read(Role.user(comment.user))],
@@ -1558,7 +1594,6 @@ export async function followUser(followerId: string, followingId: string) {
           type: "follow",
           message,
           link: `/profile/${followingId}`,
-          createdAt: new Date().toISOString(),
           read: false,
         },
         [Permission.read(Role.user(followingId))],
