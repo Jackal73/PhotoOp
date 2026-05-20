@@ -4,11 +4,22 @@ import { useGetUnreadNotificationsCount } from "@/lib/react-query/queriesAndMuta
 // This component is for the notification badge on the notifications tab
 const NotificationTabBadge = () => {
   const { user } = useUserContext();
-  const { data: unreadCount = 0 } = useGetUnreadNotificationsCount(
+  const { data: unreadCount = 0, isFetching } = useGetUnreadNotificationsCount(
     user.id,
     !!user.id,
   );
-
+  if (import.meta.env.MODE !== "production") {
+    // Debug output for badge
+    // eslint-disable-next-line no-console
+    console.log(
+      "[NotificationTabBadge] unreadCount:",
+      unreadCount,
+      "isFetching:",
+      isFetching,
+      "userId:",
+      user.id,
+    );
+  }
   if (unreadCount <= 0) return null;
 
   return (

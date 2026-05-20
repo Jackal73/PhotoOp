@@ -1,3 +1,21 @@
+// ============================== UPDATE NOTIFICATION READ STATUS
+export async function updateNotificationReadStatus(notificationId: string) {
+  try {
+    const updated = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      notificationId,
+      { read: true },
+    );
+    return updated;
+  } catch (error) {
+    console.error(
+      "[updateNotificationReadStatus] Failed to mark as read:",
+      error,
+    );
+    throw error;
+  }
+}
 // ============================== GET UNREAD NOTIFICATIONS COUNT
 export async function getUnreadNotificationsCount(
   userId: string,
@@ -35,7 +53,7 @@ export async function getNotifications(
     appwriteConfig.notificationsCollectionId,
     [
       Query.equal("userId", userId),
-      Query.orderDesc("createdAt"),
+      Query.orderDesc("$createdAt"),
       Query.limit(50),
     ],
   );
@@ -597,20 +615,27 @@ export async function likePost(
     ) {
       // Create notification for the post owner
       const message = `Someone liked your post.`;
-      await databases.createDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.notificationsCollectionId,
-        ID.unique(),
-        {
-          userId: post.creator,
-          type: "like",
-          message,
-          link: `/post/${postId}`,
-          createdAt: new Date().toISOString(),
-          read: false,
-        },
-        [Permission.read(Role.user(post.creator))],
-      );
+      try {
+        await databases.createDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.notificationsCollectionId,
+          ID.unique(),
+          {
+            userId: post.creator,
+            type: "like",
+            message,
+            link: `/post/${postId}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+          },
+          [Permission.read(Role.user(post.creator))],
+        );
+      } catch (notifError) {
+        console.error(
+          "[likePost] Failed to create like notification:",
+          notifError,
+        );
+      }
     }
 
     return updatedPost;
@@ -824,11 +849,7 @@ export async function createComment(comment: IComment) {
         childrenCommentId: comment.childrenCommentId,
         likes: [],
       },
-      [
-        Permission.read(Role.users()),
-        Permission.update(Role.user(currentAccount.$id)),
-        Permission.delete(Role.user(currentAccount.$id)),
-      ],
+      ["read", `user:${currentAccount.$id}`],
     );
 
     if (!newComment) {
@@ -846,20 +867,27 @@ export async function createComment(comment: IComment) {
       );
       if (post && post.creator !== comment.userId) {
         const message = `Someone commented on your post.`;
-        await databases.createDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.notificationsCollectionId,
-          ID.unique(),
-          {
-            userId: post.creator,
-            type: "comment",
-            message,
-            link: `/post/${comment.postId}`,
-            createdAt: new Date().toISOString(),
-            read: false,
-          },
-          [Permission.read(Role.user(post.creator))],
-        );
+        try {
+          await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.notificationsCollectionId,
+            ID.unique(),
+            {
+              userId: post.creator,
+              type: "comment",
+              message,
+              link: `/post/${comment.postId}`,
+              createdAt: new Date().toISOString(),
+              read: false,
+            },
+            ["read", `user:${post.creator}`],
+          );
+        } catch (notifError) {
+          console.error(
+            "[createComment] Failed to create comment notification:",
+            notifError,
+          );
+        }
       }
     }
 
@@ -872,26 +900,62 @@ export async function createComment(comment: IComment) {
       );
       if (parentComment && parentComment.user !== comment.userId) {
         const message = `Someone replied to your comment.`;
-        await databases.createDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.notificationsCollectionId,
-          ID.unique(),
-          {
-            userId: parentComment.user,
-            type: "comment",
-            message,
-            link: `/post/${comment.postId}`,
-            createdAt: new Date().toISOString(),
-            read: false,
-          },
-          [Permission.read(Role.user(parentComment.user))],
-        );
+        try {
+          await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.notificationsCollectionId,
+            ID.unique(),
+            {
+              userId: parentComment.user,
+              type: "comment",
+              message,
+              link: `/post/${comment.postId}`,
+              createdAt: new Date().toISOString(),
+              read: false,
+            },
+            ["read", `user:${parentComment.user}`],
+          );
+        } catch (notifError) {
+          console.error(
+            "[createComment] Failed to create reply notification:",
+            notifError,
+          );
+        }
       }
     }
 
     return newComment;
   } catch (error) {
     console.log(error);
+  }
+}
+
+// ============================== TEST NOTIFICATION CREATION
+export async function testNotification(
+  userId: string,
+  message: string = "Test notification",
+) {
+  try {
+    const res = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      ID.unique(),
+      {
+        userId,
+        type: "system",
+        message,
+        link: "/",
+        read: false,
+      },
+    );
+    console.log("[testNotification] Notification created:", res);
+    return res;
+  } catch (error) {
+    console.error(
+      "[testNotification] Failed to create test notification:",
+      error,
+    );
+    throw error;
   }
 }
 

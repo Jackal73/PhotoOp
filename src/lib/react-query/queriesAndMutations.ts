@@ -58,6 +58,7 @@ import {
   getFollowDocument,
   getFollowing,
   getFollowers,
+  updateNotificationReadStatus,
   getPendingFollowRequests,
   getUsersByIds,
   getUnreadNotificationsCount,
@@ -87,8 +88,6 @@ export const useGetNotifications = (userId: string, enabled = true) => {
     refetchInterval: 30000,
   });
 };
-
-// ...existing code...
 
 // ============================================================
 // AUTH QUERIES
@@ -783,5 +782,47 @@ export const useGetPendingFollowRequests = (userId: string) => {
     queryKey: [QUERY_KEYS.GET_PENDING_FOLLOW_REQUESTS, userId],
     queryFn: () => getPendingFollowRequests(userId),
     enabled: !!userId,
+  });
+};
+
+export const useMarkNotificationAsRead = (userId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (notificationId: string) => {
+      if (import.meta.env.MODE !== "production") {
+        // eslint-disable-next-line no-console
+        console.log(
+          "[useMarkNotificationAsRead] Marking as read:",
+          notificationId,
+          "for user:",
+          userId,
+        );
+      }
+      return updateNotificationReadStatus(notificationId);
+    },
+    onSuccess: async (_data, notificationId) => {
+      if (import.meta.env.MODE !== "production") {
+        // eslint-disable-next-line no-console
+        console.log(
+          "[useMarkNotificationAsRead] onSuccess for:",
+          notificationId,
+          "user:",
+          userId,
+        );
+      }
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", userId],
+      });
+      const refetchResult = await queryClient.refetchQueries({
+        queryKey: ["unread_notifications_count", userId],
+      });
+      if (import.meta.env.MODE !== "production") {
+        // eslint-disable-next-line no-console
+        console.log(
+          "[useMarkNotificationAsRead] refetchResult:",
+          refetchResult,
+        );
+      }
+    },
   });
 };

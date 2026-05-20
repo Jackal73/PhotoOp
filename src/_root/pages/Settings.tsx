@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUserContext } from "../../context/AuthContext";
 import { Loader } from "@/components/shared";
 import { useUpdateUser } from "@/lib/react-query/queriesAndMutations";
+import TestNotificationButton from "@/components/TestNotificationButton";
 
 const Settings: React.FC = () => {
   const { user, isLoading, setIsAuthenticated, setUser } = useUserContext();
@@ -127,6 +128,7 @@ const Settings: React.FC = () => {
               </div>
             ))}
           </div>
+          <TestNotificationButton />
         </section>
 
         {/* Danger Zone */}
