@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { testNotification } from "@/lib/appwrite/api";
 import { useUserContext } from "@/context/AuthContext";
 
